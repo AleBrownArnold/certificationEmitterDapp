@@ -12,12 +12,12 @@ import getWeb3 from "../helpers/getWeb3";
 //////////////////////////////////////////////////////////////////////////////////|
 //        CONTRACT ADDRESS           &          CONTRACT ABI                      |
 //////////////////////////////////////////////////////////////////////////////////|                                                             |
-const CONTRACT_ADDRESS = require("../contracts/SimpleStorage.json").networks[1337].address
-const CONTRACT_ABI = require("../contracts/SimpleStorage.json").abi;
-const CONTRACT_NAME = require("../contracts/SimpleStorage.json").contractName
+const CONTRACT_ADDRESS = require("../contracts/Certificate.json").networks[5777].address
+const CONTRACT_ABI = require("../contracts/Certificate.json").abi;
+const CONTRACT_NAME = require("../contracts/Certificate.json").contractName
 
 export default class App extends React.Component {
-  state = { web3Provider: null, accounts: null, networkId: null, contract: null, storageValue: null };
+  state = { web3Provider: null, accounts: null, networkId: null, contract: null, storageValue: null, receiverAddress: '' };
 
   componentDidMount = async () => {
     try {
@@ -51,10 +51,10 @@ export default class App extends React.Component {
 
   //TODO: set method to interact with Storage Smart Contract
   setMethod = async () => {
-    const { accounts, contract } = this.state;
+    const { accounts, contract, receiverAddress } = this.state;
 
     // Stores a given value, 5 by default.
-    const transaction = await contract.methods.set(5).send({ from: accounts[0] })
+    const transaction = await contract.methods.awardItem(receiverAddress, 'testing').send({ from: accounts[0] })
     console.log(transaction)
 
     // Get the updated value from the contract and updates storageValue state
@@ -63,11 +63,17 @@ export default class App extends React.Component {
 
   //TODO: get function to interact with Storage Smart Contract
   getMethod = async () => {
-    const { contract } = this.state;
+    const { contract, receiverAddress } = this.state;
 
     // Get the value from the contract to prove it worked.
-    const response = await contract.methods.get().call();
-    this.setState({ storageValue: response })
+    if (receiverAddress != '') {
+      const response = await contract.methods.balanceOf(receiverAddress).call();
+      this.setState({ storageValue: response })
+    }
+  }
+
+  setAddress = (address) => {
+    this.setState({ receiverAddress: address });
   }
 
   render() {
@@ -97,14 +103,22 @@ export default class App extends React.Component {
             If your contracts compiled and migrated successfully, below will show
             a stored value of 1 (by default).
           </p>
-          <h3>Contract stored value: {this.state.storageValue} </h3>
+          <h3>Balance Of address: { this.state.receiverAddress }: {this.state.storageValue} </h3>
           <br />
 
           {/*  DApp Actions  */}
           <p>
-            Try clicking the button below 👇 to set the value on Smart Contract to 5
+            Input an address to send a token
           </p>
-          <button onClick={this.setMethod}>Set value to 5</button>
+          <input 
+            value={this.state.receiverAddress}
+            onChange={e => this.setAddress(e.target.value)}
+            type="string"
+          />
+          <p>
+            Try clicking the button below 👇 to award receiver addresss with a token
+          </p>
+          <button type='button' onClick={this.setMethod}>Send token to address: {this.state.receiverAddress}</button>
         </div>
         {/* ---------------------------------------------------------- */}
 
