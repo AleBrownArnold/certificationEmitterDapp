@@ -24,7 +24,8 @@ export default class App extends React.Component {
     contract: null,
     storageValue: null,
     receiverAddress: '',
-    tokenUri: ''
+    tokenUri: '',
+    result: null
   };
 
   componentDidMount = async () => {
@@ -66,19 +67,8 @@ export default class App extends React.Component {
     }
   };
 
-  handleContractEvent = async () => {
-    if (!this.state.contract) return
-    this.state.contract.events.allEvents()
-      .on("connected", function (subscriptionId) {
-        console.log("New subscription with ID: " + subscriptionId)
-      })
-      .on('data', function (event) {
-        console.log("New event: %o", event)
-        if (event.event == "Transfer") {
-          console.log(event)
-          alert("The auction has finished  💰 💸")
-        }
-      })
+  setResult = async (result) => {
+    this.setState({ result });
   }
 
 
@@ -113,6 +103,26 @@ export default class App extends React.Component {
     this.setState({ tokenUri: tokenUri });
   }
 
+  test = function (event) {
+    console.log("New event: %o", event)
+    if (event.event == "Transfer") {
+      // console.log(state)
+      this.setState({ result: event.returnValues }) 
+      console.log(this.state.result);
+      alert("Token sent succesfully")
+    }
+  }
+
+  handleContractEvent = async () => {
+    if (!this.state.contract) return
+    console.log(this.state.contract.events.allEvents());
+    this.state.contract.events.allEvents()
+      .on("connected", function (subscriptionId) {
+        console.log("New subscription with ID: " + subscriptionId)
+      })
+      .on('data', this.test.bind(this))
+  }
+
   handleMetamaskEvent = async () => {
     window.ethereum.on('accountsChanged', function (accounts) {
       // Time to reload your interface with accounts[0]!
@@ -138,7 +148,7 @@ export default class App extends React.Component {
     return (
       <div className="App">
 
-        {/* ------------------- Simple Storage example ------------------- */}
+        {/* ------------------- Certification demo ------------------- */}
         <div className="App-simplestorage-example">
 
           {/* DApp Header */}
@@ -178,6 +188,15 @@ export default class App extends React.Component {
             Try clicking the button below 👇 to award receiver addresss with a token
           </p>
           <button type='button' onClick={this.setMethod}>Send token</button>
+          <br />
+          {
+            this.state.result != null &&
+            <>
+              <h2>Token sent succesfully</h2>
+              <p>Receiver address: {this.state.result.to}</p>
+              <p>Generated token id: {this.state.result.tokenId}</p>
+            </>
+          }
         </div>
         {/* ---------------------------------------------------------- */}
 
