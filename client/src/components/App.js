@@ -53,7 +53,10 @@ export default class App extends React.Component {
       // Get the value from the contract to prove it worked and update storageValue state
       this.getMethod()
 
-      this.handleMetamaskEvent();
+      this.handleMetamaskEvent()
+
+      this.handleContractEvent()
+
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -62,6 +65,21 @@ export default class App extends React.Component {
       console.error(error);
     }
   };
+
+  handleContractEvent = async () => {
+    if (!this.state.contract) return
+    this.state.contract.events.allEvents()
+      .on("connected", function (subscriptionId) {
+        console.log("New subscription with ID: " + subscriptionId)
+      })
+      .on('data', function (event) {
+        console.log("New event: %o", event)
+        if (event.event == "Transfer") {
+          console.log(event)
+          alert("The auction has finished  💰 💸")
+        }
+      })
+  }
 
 
   //TODO: set method to interact with Storage Smart Contract
@@ -138,8 +156,6 @@ export default class App extends React.Component {
             If your certification was sent successfully, below will show
             a stored value of 1 (by default).
           </p>
-          <h3>Balance Of address: { this.state.receiverAddress }: {this.state.storageValue} </h3>
-          <br />
 
           {/*  DApp Actions  */}
           <p>
@@ -161,7 +177,7 @@ export default class App extends React.Component {
           <p>
             Try clicking the button below 👇 to award receiver addresss with a token
           </p>
-          <button type='button' onClick={this.setMethod}>Send token to address: {this.state.receiverAddress}</button>
+          <button type='button' onClick={this.setMethod}>Send token</button>
         </div>
         {/* ---------------------------------------------------------- */}
 
