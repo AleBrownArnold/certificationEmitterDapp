@@ -24,7 +24,7 @@ export default class App extends React.Component {
     contract: null,
     storageValue: null,
     receiverAddress: '',
-    tokenUri: null
+    tokenUri: ''
   };
 
   componentDidMount = async () => {
@@ -132,7 +132,7 @@ export default class App extends React.Component {
 
 
           {/* DApp Information */}
-          <h2>Smart Contract: Certificate.sol 🧮</h2>
+          <h2>Smart Contract: {CONTRACT_NAME} 🧮</h2>
           <p>Contract address: {CONTRACT_ADDRESS}</p>
           <p>
             If your certification was sent successfully, below will show
