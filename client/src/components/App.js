@@ -172,6 +172,7 @@ export default class App extends React.Component {
             Input an address to send a token
           </p>
           <input 
+            className='inputs'
             value={this.state.receiverAddress}
             onChange={e => this.setAddress(e.target.value)}
             type="string"
@@ -180,6 +181,7 @@ export default class App extends React.Component {
             Input token uri
           </p>
           <input 
+            className='inputs'
             value={this.state.tokenUri}
             onChange={e => this.setTokenUri(e.target.value)}
             type="string"
