@@ -20,4 +20,13 @@ contract Certificate is ERC721URIStorage {
     _tokenIds.increment();
     return newItemId;
   }
+
+  function _beforeTokenTransfer(
+    address from,
+    address to,
+    uint256 firstTokenId,
+    uint256 batchSize
+  ) internal override virtual {
+    require (from == address(0) || to == address(0), "This is not a transferable token");
+  }
 }
